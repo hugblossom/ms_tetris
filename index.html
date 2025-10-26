@@ -347,7 +347,7 @@
 				this.overlay.id = "overlay";
 				this.overlay.innerHTML =
 					`
-						<button type="button" id="start">게임 시작</button>
+						<button type="button" id="start">GAME START</button>
 					`;
 				this.MS_TETRIS.appendChild(this.overlay);
 			}
@@ -373,7 +373,7 @@
                         this.createBlock();
                         if (this.checkCollision(this.currentBlock.currentType, this.currentBlock.position)) {
 							this.MS_TETRIS.appendChild(this.overlay);
-                            alert("game over");
+                            alert("GAME OVER");
                             return;
                         }
 						this.currentGame.clearBlock();
