@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <script>
+        const MS_TETRIS = function() {
+            this.grid = {
+                horizontal: 11,
+                vertical: 20
+            }
+			this.gameOption = {
+				scorePerBlock: 10,
+				scorePerLine: 100,
+				speedPerStage: 50,
+			}
+            this.protoTypes = {
+                    1: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [0, 1, 1, 0],
+                                [0, 1, 1, 0],
+                                [0, 0, 0, 0],
+                            ]
+                        ],
+                        color: "red"
+                    },
+                    2: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [1, 1, 1, 1],
+                                [0, 0, 0, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0]
+                            ]
+                        ],
+                        color: "green"
+                    },
+                    3: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [0, 0, 1, 1],
+                                [0, 1, 1, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 1],
+                                [0, 0, 0, 1],
+                                [0, 0, 0, 0],
+                            ]
+                        ],
+                        color: "blue"
+                    },
+                    4: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [0, 1, 1, 0],
+                                [0, 0, 1, 1],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 0, 1],
+                                [0, 0, 1, 1],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 0],
+                            ]
+                        ],
+                        color: "yellow"
+                    },
+                    5: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [0, 1, 1, 1],
+                                [0, 1, 0, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 1],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 0, 1],
+                                [0, 1, 1, 1],
+                                [0, 0, 0, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 1, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 0],
+                            ]
+                        ],
+                        color: "orange"
+                    },
+                    6: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [0, 1, 1, 1],
+                                [0, 0, 0, 1],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 1],
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 1, 0, 0],
+                                [0, 1, 1, 1],
+                                [0, 0, 0, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 1, 1, 0],
+                                [0, 0, 0, 0],
+                            ]
+                        ],
+                        color: "purple"
+                    },
+                    7: {
+                        types: [
+                            [
+                                [0, 0, 0, 0],
+                                [0, 1, 1, 1],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 0, 1, 1],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 1, 1, 1],
+                                [0, 0, 0, 0],
+                                [0, 0, 0, 0],
+                            ],
+                            [
+                                [0, 0, 1, 0],
+                                [0, 1, 1, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 0],
+                            ]
+                        ],
+                        color: "skyblue"
+                    }
+                }
+            this.cellSize = 50;
+            this.Block = function(protoType, position) {//Class
+                this.protoType = protoType;
+                this.currentType = 0;
+                this.position = position;
+            }
+			this.Game = function(root, option) {
+				this.rootLayer = root;//Class
+				this.option = option;
+				this.stage = 1;
+				this.score = 0;
+				this.speed = 1000;
+				this.clearedBlocks = 0;
+				this.clearedLines = 0;
+				this.clearBlock = () => {
+					this.clearedBlocks ++;
+					this.score += this.option.scorePerBlock * this.stage;
+					this.updateInfo();
+				}
+				this.clearLine = () => {
+					this.clearedLines ++;
+					if (!(this.clearedLines % 5)) this.upStage();
+					this.score += this.option.scorePerLine * this.stage;
+					this.updateInfo();
+				}
+				this.upStage = () => {
+					this.stage ++;
+					this.setSpeed();
+					this.updateInfo();
+				}
+				this.setSpeed = () => {
+					this.speed = 1000 - this.stage * this.option.speedPerStage;
+				}
+				this.setGameInfo = () => {
+					this.gameInfo = document.createElement("div");
+					this.gameInfo.id = "gameInfo";
+					this.gameInfo.innerHTML =
+					`
+						<div id="stage">
+							<em>STAGE: </em>
+							<span class="value">${this.stage}</span>
+						</div>
+						<div id="score">
+							<em>SCORE: </em>
+							<span class="value">${this.score}</span>
+						</div>
+					`;
+					this.rootLayer.appendChild(this.gameInfo);
+				}
+				this.updateInfo = () => {
+					this.gameInfo.querySelector("#stage .value").textContent = this.stage;
+					this.gameInfo.querySelector("#score .value").textContent = this.score;
+				}
+				this.init = () => {
+					this.setSpeed();
+					this.setGameInfo();
+				}
+				this.init();
+			}
+			this.createBlock = () => {
+                const pickedType = this.protoTypes[this.pickType()];
+                const blockWidth = pickedType.types[0].length;
+				const position = {x: 0, y: 0};
+				position.x = Math.floor(this.grid.horizontal / 2) - (Math.floor(blockWidth / 2));
+                pickedType.types[0].forEach((row, y) => {
+                    if (position.y < 0) return;
+                    if (row.includes(1)) position.y -= y;
+                });
+                this.currentBlock = new this.Block(pickedType, position);
+                this.updateBlockLayer();
+                this.renderBlockLayer();
+            }
+			this.createGame = () => {
+				if (typeof this.currentGame !== 'undefined') this.currentGame.gameInfo.remove();
+				this.currentGame = new this.Game(this.MS_TETRIS, this.gameOption);
+			}
+			this.startGame = () => {
+				this.refresh();
+				this.createGame();
+				this.setInterval(this.currentGame.speed);
+				this.overlay.remove();
+			}
+            this.pickType = () => {
+                return Math.floor(Math.random() * 7 + 1);
+            }
+            this.initLayerData = () => {
+                const layerData = [];
+                for (let y = 0; y < this.grid.vertical; y++) {
+                    const row = [];
+                    for (let x = 0; x < this.grid.horizontal; x++) {
+                        row.push(0);
+                    }
+                    layerData.push(row);
+                }
+                return layerData;
+            };
+            this.clearLayerData = (data) => {
+                data.forEach((row, y) => {
+                    row.forEach((col, x) => {
+                        data[y][x] = 0;
+                    });
+                });
+            }
+			this.setRootLayer = () => {
+				this.MS_TETRIS = document.createElement("div");
+				this.MS_TETRIS.id = "MS_TETRIS";
+				document.querySelector("body").appendChild(this.MS_TETRIS);
+			}
+            this.setFieldLayer = () => {
+                this.fieldLayer = document.createElement("div");
+                this.fieldLayer.id = "field-layer";
+                this.fieldLayer.classList.add("layer");
+                this.fieldLayer.setAttribute("style", 
+                `
+                    width: ${this.grid.horizontal * this.cellSize}rem;
+                    height: ${this.grid.vertical * this.cellSize}rem;
+                `);
+                this.fieldLayerData = this.initLayerData();
+                this.fieldLayerData.forEach((row, y) => {
+                    row.forEach((col, x) => {
+                        const cell = document.createElement("span");
+                        cell.classList.add(`cell${y}-${x}`);
+                        cell.setAttribute("style", 
+                        `
+                            width: ${this.cellSize}rem;
+                            height: ${this.cellSize}rem;
+                        `);
+                        this.fieldLayer.appendChild(cell);
+                    });
+                });
+                this.MS_TETRIS.appendChild(this.fieldLayer);
+            }
+            this.setBlockLayer = () => {
+                this.blockLayerData = this.initLayerData();
+                this.blockLayer = this.fieldLayer.cloneNode(true);
+                this.blockLayer.id = "block-layer";
+                this.MS_TETRIS.appendChild(this.blockLayer);
+            }
+			this.setOverlay = () => {
+				this.overlay = document.createElement("div");
+				this.overlay.id = "overlay";
+				this.overlay.innerHTML =
+					`
+						<button type="button" id="start">게임 시작</button>
+					`;
+				this.MS_TETRIS.appendChild(this.overlay);
+			}
+            this.move = (direction) => {
+                const targetPosition = {...this.currentBlock.position}
+                switch (direction) {
+                    case "down": targetPosition.y ++; break;
+                    case "left": targetPosition.x --; break;
+                    case "right": targetPosition.x ++; break;
+					case "bottom": 
+						while(!this.checkCollision(this.currentBlock.currentType, targetPosition)) {
+							targetPosition.y ++;
+						}
+						this.currentBlock.position.y = targetPosition.y - 1;
+						this.updateBlockLayer();
+						break;
+                }
+
+                if (this.checkCollision(this.currentBlock.currentType, targetPosition)) {
+                    if (direction === "down" || direction === "bottom") {
+                        clearInterval(this.interval);
+                        this.mergeLayer();
+                        this.createBlock();
+                        if (this.checkCollision(this.currentBlock.currentType, this.currentBlock.position)) {
+							this.MS_TETRIS.appendChild(this.overlay);
+                            alert("game over");
+                            return;
+                        }
+						this.currentGame.clearBlock();
+                        this.setInterval(this.currentGame.speed);
+                    } else {
+                        return;
+                    }
+                } else {
+                    this.currentBlock.position = targetPosition;
+                    this.updateBlockLayer();
+                    this.renderBlockLayer();
+                };
+            }
+            this.setInterval = (speed) => {
+                this.interval = setInterval(() => {
+                    this.move("down");
+                }, speed);
+            }
+            this.updateBlockLayer = () => {
+                this.clearLayerData(this.blockLayerData);
+                this.currentBlock.protoType.types[this.currentBlock.currentType].forEach((row, y) => {
+                    const targetY = this.currentBlock.position.y + y;
+                    if (typeof this.blockLayerData[targetY] === 'undefined') return;
+                    row.forEach((col, x) => {
+                        const targetX = this.currentBlock.position.x + x;
+                        if (typeof this.blockLayerData[targetY][targetX] === 'undefined') return;
+                        this.blockLayerData[targetY][targetX] = col ? this.currentBlock.protoType.color : col;
+                    });
+                });
+            }
+            this.mergeLayer = () => {
+                const currentBlockType = this.currentBlock.protoType.types[this.currentBlock.currentType]; 
+                for (let y = this.currentBlock.position.y; y < this.currentBlock.position.y + currentBlockType.length; y ++) {
+                    for (let x = this.currentBlock.position.x; x < this.currentBlock.position.x + currentBlockType[0].length; x ++) {
+                        if (typeof this.blockLayerData[y] === 'undefined'
+                            || typeof this.blockLayerData[y][x] === 'undefined'
+                            || !this.blockLayerData[y][x]) {
+                            continue;
+                        }
+                        this.fieldLayerData[y][x] = this.blockLayerData[y][x];
+                        if (!this.fieldLayerData[y].includes(0)) {
+                            this.fieldLayerData.splice(y, 1);
+                            this.fieldLayerData.unshift(Array.from({length: this.grid.horizontal}, () => 0));
+							this.currentGame.clearLine();
+                        }
+                    }
+                }
+                this.clearLayerData(this.blockLayerData);
+                this.renderFieldLayer();
+                this.renderBlockLayer();
+            }
+            this.checkCollision = (type, position) => {
+                let collision = false;
+                this.currentBlock.protoType.types[type].forEach((row, y) => {
+                    row.forEach((col, x) => {
+                        const fieldY = position.y + y;
+                        const fieldX = position.x + x;
+                        if (typeof this.fieldLayerData[fieldY] === 'undefined') {
+                            if (col) collision = true;
+                        } else {
+                            if (col) {
+                                if (typeof this.fieldLayerData[fieldY][fieldX] === 'undefined') {
+                                    collision = true;
+                                }
+                                if (this.fieldLayerData[fieldY][fieldX]) {
+                                    collision = true;
+                                }
+                            }
+                        }
+                    });
+                });
+                return collision;
+            }
+            this.renderFieldLayer = () => {
+                this.fieldLayerData.forEach((row, y) => {
+                    row.forEach((col, x) => {
+                        this.fieldLayer.querySelector(`.cell${y}-${x}`).style.background = col ? col : "transparent";
+                    });
+                });
+            }
+            this.renderBlockLayer = () => {
+                this.blockLayerData.forEach((row, y) => {
+                    row.forEach((col, x) => {
+                        this.blockLayer.querySelector(`.cell${y}-${x}`).style.background = col ? col : "transparent";
+                    });
+                });
+            }
+			this.compareEdge = (nextType) => {
+				const currentBlockType = this.currentBlock.protoType.types;
+				let currentTop = currentBlockType[this.currentBlock.currentType].length - 1;
+				let currentLeft = currentBlockType[this.currentBlock.currentType][0].length - 1;
+				let currentRight = 0;
+				currentBlockType[this.currentBlock.currentType].forEach((row, y) => {
+					row.forEach((col, x) => {
+						if (col) {
+							if (y < currentTop) currentTop = y;
+							if (x < currentLeft) currentLeft = x;
+							if (x > currentRight) currentRight = x;
+						}
+					});
+				});
+				let nextTop = currentBlockType[nextType].length - 1;
+				let nextLeft = currentBlockType[nextType][0].length - 1;
+				let nextRight = 0;
+				currentBlockType[nextType].forEach((row, y) => {
+					row.forEach((col, x) => {
+						if (col) {
+							if (y < nextTop) nextTop = y;
+							if (x < nextLeft) nextLeft = x;
+							if (x > nextRight) nextRight = x;
+						}
+					});
+				});
+				return {top: currentTop - nextTop, left: currentLeft - nextLeft, right: currentRight - nextRight}
+			}
+            this.changeType = ()  => {
+                const nextType = typeof this.currentBlock.protoType.types[this.currentBlock.currentType + 1] === 'undefined' ? 0 : this.currentBlock.currentType + 1;
+				const targetPosition = {...this.currentBlock.position};
+                if (this.checkCollision(nextType, targetPosition)) {
+					const comparedEdge = this.compareEdge(nextType);
+					if (this.currentBlock.position.y < this.currentBlock.protoType.types[this.currentBlock.currentType].length) {
+						targetPosition.y = targetPosition.y + comparedEdge.top;
+					}
+					if (this.currentBlock.position.x < this.currentBlock.protoType.types[this.currentBlock.currentType][0].length) {
+						targetPosition.x = targetPosition.x + comparedEdge.left;						
+					}
+					if (this.currentBlock.position.x + this.currentBlock.protoType.types[this.currentBlock.currentType][0].length > this.grid.horizontal) {
+						targetPosition.x = targetPosition.x + comparedEdge.right;
+					}	
+				}
+				if (!this.checkCollision(nextType, targetPosition)) {
+					this.currentBlock.position = targetPosition;
+					this.currentBlock.currentType = nextType;
+					this.updateBlockLayer();
+					this.renderBlockLayer();
+				}
+            }
+            this.init = () => {
+				this.setRootLayer();
+                this.setFieldLayer();
+                this.setBlockLayer();
+				this.setOverlay();
+                this.addEventListener();				
+            }
+			this.refresh = () => {
+				clearInterval(this.interval);
+				this.clearLayerData(this.blockLayerData);
+				this.clearLayerData(this.fieldLayerData);
+				this.renderFieldLayer();
+				this.createBlock();
+			}
+            this.addEventListener = () => {
+                document.addEventListener("keydown", e => {
+                    switch (e.keyCode) {
+                        case 40: this.move("down"); break;
+                        case 37: this.move("left"); break;
+                        case 39: this.move("right"); break;
+                        case 38: this.changeType(); break;
+						case 32: this.move("bottom"); break;
+                    }
+                });
+				this.overlay.querySelector("#start").addEventListener("click", e => {
+					this.startGame();
+				});
+            }
+            return this;
+        }
+
+        const ms_tetris = new MS_TETRIS();
+        ms_tetris.init();
+    </script>
+</body>
+</html>

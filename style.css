@@ -1,0 +1,88 @@
+@charset "UTF-8";
+
+html {
+    font-size: .04vw;
+}
+
+#MS_TETRIS {
+    display: inline-block;
+    position: relative;
+    font-size: 0;
+}
+
+#MS_TETRIS * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#block-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+}
+
+#field-layer {
+    background-color: #000;
+}
+
+.layer span {
+    display: block;
+    float: left;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, .25);
+}
+
+#gameInfo {
+    background: #56555c;
+}
+
+#gameInfo * {
+    color: #fff;
+    font-size: 30rem;
+}
+
+#gameInfo > div {
+    display: inline-block;
+    padding-right: 30rem;
+}
+
+#gameInfo em {
+    font-weight: bold;
+}
+
+#overlay {
+    z-index: 50;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-align: center;
+    background: rgba(0, 0, 0, .5);
+}
+
+#overlay::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 100%;
+    vertical-align: middle;
+}
+
+#overlay #start {
+    width: 180rem;
+    height: 60rem;
+    vertical-align: middle;
+    font-size: 30rem;
+    font-weight: bold;
+    background: yellow;
+}
+
+@media (max-width: 500px)  {
+    html {
+        font-size: .175vw; 
+        overflow: hidden;
+    }
+}
