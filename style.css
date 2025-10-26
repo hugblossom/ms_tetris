@@ -72,11 +72,14 @@ html {
 }
 
 #overlay #start {
-    width: 180rem;
+    width: 240rem;
     height: 60rem;
     vertical-align: middle;
     font-size: 30rem;
     font-weight: bold;
+    color: darkblue;
+    padding-top: 5rem;
+    border: 5rem solid orange;
     background: yellow;
 }
 
