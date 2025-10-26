@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MS TETRIS</title>
+    <title>Document</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -229,15 +229,11 @@
 				this.init();
 			}
 			this.createBlock = () => {
-                const pickedType = this.protoTypes[this.pickType()];
-                const blockWidth = pickedType.types[0].length;
-				const position = {x: 0, y: 0};
-				position.x = Math.floor(this.grid.horizontal / 2) - (Math.floor(blockWidth / 2));
-                pickedType.types[0].forEach((row, y) => {
-                    if (position.y < 0) return;
-                    if (row.includes(1)) position.y -= y;
-                });
-                this.currentBlock = new this.Block(pickedType, position);
+                const pickedCurrentType = this.pickType();
+                this.currentBlock = typeof this.nextBlock === 'undefined' ? new this.Block(pickedCurrentType.protoType, pickedCurrentType.position) : this.nextBlock;
+                const pickedNextType = this.pickType();
+                this.nextBlock = new this.Block(pickedNextType.protoType, pickedNextType.position);
+                this.setNextBlockPreview(this.nextBlock.protoType);
                 this.updateBlockLayer();
                 this.renderBlockLayer();
             }
@@ -252,7 +248,15 @@
 				this.overlay.remove();
 			}
             this.pickType = () => {
-                return Math.floor(Math.random() * 7 + 1);
+                const protoType = this.protoTypes[Math.floor(Math.random() * Object.keys(this.protoTypes).length + 1)];
+                const blockWidth = protoType.types[0].length;
+				const position = {x: 0, y: 0};
+				position.x = Math.floor(this.grid.horizontal / 2) - (Math.floor(blockWidth / 2));
+                protoType.types[0].forEach((row, y) => {
+                    if (position.y < 0) return;
+                    if (row.includes(1)) position.y -= y;
+                });
+                return {protoType, position};
             }
             this.initLayerData = () => {
                 const layerData = [];
@@ -306,6 +310,37 @@
                 this.blockLayer = this.fieldLayer.cloneNode(true);
                 this.blockLayer.id = "block-layer";
                 this.MS_TETRIS.appendChild(this.blockLayer);
+            }
+            this.setNextBlockPreview = (protoType) => {
+                if (typeof this.nextBlockPreview === 'undefined') {
+                    this.nextBlockPreview = document.createElement("div");
+                    this.nextBlockPreview.id = "next-block-preview";
+                    this.nextBlockPreview.classList.add("layer");
+                    this.nextBlockPreview.setAttribute("style", 
+                    `
+                        width: ${protoType.types[0][0].length * this.cellSize}rem;
+                        height: ${protoType.types[0].length * this.cellSize}rem;
+                        position: absolute;
+                        left: 100%;
+                        top: 0;
+                        overflow: hidden;
+                    `);
+                }
+                this.nextBlockPreview.innerHTML = "";
+                protoType.types[0].forEach((row, y) => {
+                    row.forEach((col, x) => {
+                        const cell = document.createElement("span");
+                        cell.classList.add(`cell${y}-${x}`);
+                        cell.setAttribute("style", 
+                        `
+                            width: ${this.cellSize}rem;
+                            height: ${this.cellSize}rem;
+                        `);
+                        if (col) cell.style.background = protoType.color;
+                        this.nextBlockPreview.appendChild(cell);
+                    });
+                });
+                this.MS_TETRIS.appendChild(this.nextBlockPreview);
             }
 			this.setOverlay = () => {
 				this.overlay = document.createElement("div");
@@ -511,5 +546,4 @@
         ms_tetris.init();
     </script>
 </body>
-
 </html>
