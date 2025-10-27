@@ -576,6 +576,12 @@
 				this.renderFieldLayer();
 				this.createBlock();
 			}
+            this.initTouchStatus = (e) => {
+                this.touchStatus["initialX"] = e.clientX;
+                this.touchStatus["initialY"] = e.clientY;
+                this.touchStatus["amountX"] = 0;
+                this.touchStatus["amountY"] = 0;
+            }
             this.addTouchEventListener = () => {
                 this.touchStatus = {};
                 this.touchStatus["dragging"] = false;
@@ -583,10 +589,7 @@
 
                 this.handlePointerDown = (e) => {
                     this.touchStatus.dragging = true;
-                    this.touchStatus["initialX"] = e.clientX;
-                    this.touchStatus["initialY"] = e.clientY;
-                    this.touchStatus["amountX"] = 0;
-                    this.touchStatus["amountY"] = 0;
+                    this.initTouchStatus(e);
 
                     e.target.setPointerCapture(e.pointerId);
 
@@ -599,25 +602,28 @@
                     this.touchStatus["movedY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
                     this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
-                    
                     if (this.touchStatus.absMovedX > this.touchStatus.unit / 2 || this.touchStatus["movedY"] > this.touchStatus.unit) {
                         if (this.touchStatus.absMovedX >= this.touchStatus.absMovedY) {
                             const currentAmount = Math.round(this.touchStatus.absMovedX / this.touchStatus.unit);
                             if (this.touchStatus.amountX === currentAmount) return;
                             this.touchStatus.amountX = currentAmount;
                             this.touchStatus.movedX < 0 ? this.move("left") : this.move("right");
+                            this.touchStatus.moved = true;
+                            this.initTouchStatus(e);
                         }
                     }
                 }
                 this.handlePointerUp = (e) => {
                     this.touchStatus.dragging = false;
+                    const moved = typeof this.touchStatus.moved !== 'undefined' && this.touchStatus.moved ? true : false;
                     if (this.touchStatus.absMovedX <= this.touchStatus.unit / 2 && this.touchStatus.absMovedY <= this.touchStatus.unit * 1.2) {
-                        if (typeof this.currentBlock !== 'undefined') this.changeType();
+                        if (!moved && typeof this.currentBlock !== 'undefined') this.changeType();
                     } else {
                         if (this.touchStatus.movedY > this.touchStatus.unit * 1.5 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
                             this.move("bottom");
                         }
                     }
+                    this.touchStatus["moved"] = false;
                     this.touchStatus.movedX = 0;
                     this.touchStatus.movedY = 0;
                     this.touchStatus.absMovedX = 0;
@@ -673,4 +679,3 @@
     </script>
 </body>
 </html>
-
