@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2510271611">
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <script>
         const MS_TETRIS = function() {
             this.grid = {
                 horizontal: 11,
-                vertical: 18
+                vertical: 19
             }
 			this.gameOption = {
 				scorePerBlock: 10,
@@ -565,7 +565,7 @@
                 }
                 this.handlePointerUp = (e) => {
                     this.touchStatus.dragging = false;
-                    if (this.touchStatus.absMovedX <= this.touchStatus.unit / 2 && this.touchStatus.absMovedY <= this.touchStatus.unit * 1.5) {
+                    if (this.touchStatus.absMovedX <= this.touchStatus.unit / 2 && this.touchStatus.absMovedY <= this.touchStatus.unit * 1.2) {
                         if (typeof this.currentBlock !== 'undefined') this.changeType();
                     } else {
                         if (this.touchStatus.movedY > this.touchStatus.unit * 1.5 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
@@ -610,4 +610,3 @@
     </script>
 </body>
 </html>
-
