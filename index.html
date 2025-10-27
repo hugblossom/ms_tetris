@@ -615,6 +615,7 @@
                 }
                 this.handlePointerUp = (e) => {
                     this.touchStatus.dragging = false;
+                    e.target.releasePointerCapture(e.pointerId);
                     const moved = typeof this.touchStatus.moved !== 'undefined' && this.touchStatus.moved ? true : false;
                     if (this.touchStatus.absMovedX <= this.touchStatus.unit / 2 && this.touchStatus.absMovedY <= this.touchStatus.unit * 1.2) {
                         if (!moved && typeof this.currentBlock !== 'undefined') this.changeType();
