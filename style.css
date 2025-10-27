@@ -116,7 +116,7 @@ body::before {
 
 @media (max-width: 500px)  {
     html {
-        font-size: .175vw; 
+        font-size: .17vw; 
     }
 
     #next-block-preview {
