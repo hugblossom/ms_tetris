@@ -579,7 +579,8 @@
             this.initTouchStatus = (e) => {
                 this.touchStatus["initialX"] = e.clientX;
                 this.touchStatus["initialY"] = e.clientY;
-
+                this.touchStatus["amountX"] = 0;
+                this.touchStatus["amountY"] = 0;
             }
             this.addTouchEventListener = () => {
                 this.touchStatus = {};
@@ -601,10 +602,10 @@
                     this.touchStatus["movedY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
                     this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
-                    if (this.touchStatus.absMovedX > this.touchStatus.unit / 3 || this.touchStatus["movedY"] > this.touchStatus.unit) {
+                    if (this.touchStatus.absMovedX > this.touchStatus.unit / 4) {
                         if (this.touchStatus.absMovedX >= this.touchStatus.absMovedY) {
-                            const currentAmount = this.touchStatus.absMovedX / this.touchStatus.unit;
-                            if (Math.abs(this.touchStatus.amountX - currentAmount) < .2) return;
+                            const currentAmount = Math.round(this.touchStatus.absMovedX / (this.touchStatus.unit / 1.5));
+                            if (this.touchStatus.amountX === currentAmount) return;
                             this.touchStatus.amountX = currentAmount;
                             this.touchStatus.movedX < 0 ? this.move("left") : this.move("right");
                             this.touchStatus.moved = true;
