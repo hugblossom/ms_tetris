@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>MS TETRIS</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -244,9 +244,15 @@
 			this.startGame = () => {
 				this.refresh();
 				this.createGame();
-				this.setInterval(this.currentGame.speed);
+                this.addTouchEventListener();
+				//this.setInterval(this.currentGame.speed);
 				this.overlay.remove();
 			}
+            this.endGame = () => {
+                this.removeTouchEventListener();
+                this.MS_TETRIS.appendChild(this.overlay);
+                alert("GAME OVER");
+            }
             this.pickType = () => {
                 const protoType = this.protoTypes[Math.floor(Math.random() * Object.keys(this.protoTypes).length + 1)];
                 const blockWidth = protoType.types[0].length;
@@ -353,6 +359,7 @@
 			}
             this.move = (direction) => {
                 const targetPosition = {...this.currentBlock.position}
+                const moveAmount = typeof amount === 'undefined' ? 1 : amount;
                 switch (direction) {
                     case "down": targetPosition.y ++; break;
                     case "left": targetPosition.x --; break;
@@ -365,15 +372,13 @@
 						this.updateBlockLayer();
 						break;
                 }
-
                 if (this.checkCollision(this.currentBlock.currentType, targetPosition)) {
                     if (direction === "down" || direction === "bottom") {
                         clearInterval(this.interval);
                         this.mergeLayer();
                         this.createBlock();
                         if (this.checkCollision(this.currentBlock.currentType, this.currentBlock.position)) {
-							this.MS_TETRIS.appendChild(this.overlay);
-                            alert("GAME OVER");
+                            this.endGame();
                             return;
                         }
 						this.currentGame.clearBlock();
@@ -516,7 +521,7 @@
                 this.setFieldLayer();
                 this.setBlockLayer();
 				this.setOverlay();
-                this.addEventListener();				
+                this.addEventListener();
             }
 			this.refresh = () => {
 				clearInterval(this.interval);
@@ -525,6 +530,64 @@
 				this.renderFieldLayer();
 				this.createBlock();
 			}
+            this.addTouchEventListener = () => {
+                this.touchStatus = {};
+                this.touchStatus["dragging"] = false;
+                this.touchStatus["unit"] = this.blockLayer.querySelectorAll('[class*=cell]')[0].offsetWidth;
+
+                this.handlePointerDown = (e) => {
+                    this.touchStatus.dragging = true;
+                    this.touchStatus["initialX"] = e.clientX;
+                    this.touchStatus["initialY"] = e.clientY;
+                    this.touchStatus["amountX"] = 0;
+                    this.touchStatus["amountY"] = 0;
+
+                    e.target.setPointerCapture(e.pointerId);
+
+                    this.MS_TETRIS.addEventListener('pointermove', this.handlePointerMove);
+                    this.MS_TETRIS.addEventListener('pointerup', this.handlePointerUp);
+                }
+                this.handlePointerMove = (e) => {
+                    if (!this.touchStatus.dragging) return;
+                    this.touchStatus["movedX"] = e.clientX - this.touchStatus.initialX;
+                    this.touchStatus["movedY"] = e.clientY - this.touchStatus.initialY;
+                    this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
+                    this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
+                    
+                    if (this.touchStatus.absMovedX > this.touchStatus.unit || this.touchStatus["movedY"] > this.touchStatus.unit) {
+                        if (this.touchStatus.absMovedX >= this.touchStatus.absMovedY) {
+                            const currentAmount = Math.round(this.touchStatus.absMovedX / this.touchStatus.unit);
+                            if (this.touchStatus.amountX === currentAmount) return;
+                            this.touchStatus.amountX = currentAmount;
+                            this.touchStatus.movedX < 0 ? this.move("left") : this.move("right");
+                        }
+                    }
+                }
+                this.handlePointerUp = (e) => {
+                    this.touchStatus.dragging = false;
+                    if (this.touchStatus.absMovedX <= this.touchStatus.unit && this.touchStatus.absMovedY <= this.touchStatus.unit) {
+                        if (typeof this.currentBlock !== 'undefined') this.changeType();
+                    } else {
+                        if (this.touchStatus.movedY > this.touchStatus.unit * 3 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
+                            this.move("bottom");
+                        }
+                    }
+                    this.touchStatus.movedX = 0;
+                    this.touchStatus.movedY = 0;
+                    this.touchStatus.absMovedX = 0;
+                    this.touchStatus.absMovedY = 0;
+
+                    this.MS_TETRIS.removeEventListener('pointermove', this.handlePointerMove);
+                    this.MS_TETRIS.removeEventListener('pointerup', this.handlePointerUp);
+                }
+                
+                this.MS_TETRIS.addEventListener('pointerdown', this.handlePointerDown);
+            }
+            this.removeTouchEventListener = () => {
+                this.MS_TETRIS.removeEventListener('pointerdown', this.handlePointerDown);
+                this.MS_TETRIS.removeEventListener('pointermove', this.handlePointerMove);
+                this.MS_TETRIS.removeEventListener('pointerup', this.handlePointerUp);
+            }
             this.addEventListener = () => {
                 document.addEventListener("keydown", e => {
                     switch (e.keyCode) {
@@ -535,7 +598,7 @@
 						case 32: this.move("bottom"); break;
                     }
                 });
-				this.overlay.querySelector("#start").addEventListener("click", e => {
+				this.MS_TETRIS.querySelector("#start").addEventListener("click", e => {
 					this.startGame();
 				});
             }
