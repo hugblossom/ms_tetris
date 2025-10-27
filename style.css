@@ -32,6 +32,7 @@ body {
 }
 
 #block-layer {
+    z-index: 1;
     position: absolute;
     left: 0;
     top: 0;
@@ -39,7 +40,12 @@ body {
 }
 
 #field-layer {
+    z-index: 0;
     background-color: #000;
+}
+
+#next-block-preview {
+    z-index: 0;
 }
 
 .layer span {
@@ -106,5 +112,6 @@ body {
     #next-block-preview {
         left: auto !important;
         right: 0;
+        opacity: .25;
     }
 }
