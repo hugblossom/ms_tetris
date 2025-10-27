@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2510271542">
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <script>
@@ -554,7 +554,7 @@
                     this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
                     this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
                     
-                    if (this.touchStatus.absMovedX > this.touchStatus.unit || this.touchStatus["movedY"] > this.touchStatus.unit) {
+                    if (this.touchStatus.absMovedX > this.touchStatus.unit / 2 || this.touchStatus["movedY"] > this.touchStatus.unit) {
                         if (this.touchStatus.absMovedX >= this.touchStatus.absMovedY) {
                             const currentAmount = Math.round(this.touchStatus.absMovedX / this.touchStatus.unit);
                             if (this.touchStatus.amountX === currentAmount) return;
@@ -565,7 +565,7 @@
                 }
                 this.handlePointerUp = (e) => {
                     this.touchStatus.dragging = false;
-                    if (this.touchStatus.absMovedX <= this.touchStatus.unit && this.touchStatus.absMovedY <= this.touchStatus.unit) {
+                    if (this.touchStatus.absMovedX <= this.touchStatus.unit / 2 && this.touchStatus.absMovedY <= this.touchStatus.unit) {
                         if (typeof this.currentBlock !== 'undefined') this.changeType();
                     } else {
                         if (this.touchStatus.movedY > this.touchStatus.unit * 2 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
@@ -610,6 +610,3 @@
     </script>
 </body>
 </html>
-
-
-
