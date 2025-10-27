@@ -69,18 +69,28 @@ body::before {
     background: #56555c;
 }
 
-#gameInfo * {
+.gameInfo * {
     color: #fff;
     font-size: 30rem;
 }
 
 #gameInfo > div {
     display: inline-block;
+    vertical-align: middle;
     padding-right: 30rem;
 }
 
-#gameInfo em {
+.gameInfo > em {
     font-weight: bold;
+}
+
+#pause {
+    vertical-align: middle;
+    font-weight: bold;
+    color: #fff;
+    padding: 5rem;
+    border: none;
+    background: blue;    
 }
 
 #overlay {
@@ -102,17 +112,31 @@ body::before {
     vertical-align: middle;
 }
 
-#overlay #start {
-    width: 240rem;
+#start {
     height: 60rem;
     vertical-align: middle;
     font-size: 30rem;
     font-weight: bold;
     color: darkblue;
-    padding-top: 5rem;
+    padding: 5rem 10rem 0;
     border: 5rem solid orange;
     background: yellow;
 }
+
+#start:not(:only-child) {
+    margin-top: 30rem;
+}
+
+#overlay .inner {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#overlay .inner h3.title {
+    font-size: 45rem;
+    color: yellow;
+}
+
 
 @media (max-width: 500px)  {
     html {
