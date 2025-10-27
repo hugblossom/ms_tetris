@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style.css?2510271741">
 </head>
 <body>
     <script>
@@ -183,6 +183,8 @@
 				this.speed = 1000;
 				this.clearedBlocks = 0;
 				this.clearedLines = 0;
+                this.started = false;
+                this.paused = false;
 				this.clearBlock = () => {
 					this.clearedBlocks ++;
 					this.score += this.option.scorePerBlock * this.stage;
@@ -207,22 +209,27 @@
 					this.gameInfo.id = "gameInfo";
 					this.gameInfo.innerHTML =
 					`
-						<div id="stage">
+						<div class="gameInfo stage">
 							<em>STAGE: </em>
 							<span class="value">${this.stage}</span>
 						</div>
-						<div id="score">
+						<div class="gameInfo score">
 							<em>SCORE: </em>
 							<span class="value">${this.score}</span>
 						</div>
 					`;
+                    this.pauseButton = document.createElement("button");
+                    this.pauseButton.id = "pause";
+                    this.pauseButton.textContent = "PAUSE";
+                    this.gameInfo.appendChild(this.pauseButton);
 					this.rootLayer.appendChild(this.gameInfo);
 				}
 				this.updateInfo = () => {
-					this.gameInfo.querySelector("#stage .value").textContent = this.stage;
-					this.gameInfo.querySelector("#score .value").textContent = this.score;
+					this.gameInfo.querySelector(".stage .value").textContent = this.stage;
+					this.gameInfo.querySelector(".score .value").textContent = this.score;
 				}
 				this.init = () => {
+                    this.started = true;
 					this.setSpeed();
 					this.setGameInfo();
 				}
@@ -245,13 +252,27 @@
 				this.refresh();
 				this.createGame();
                 this.addTouchEventListener();
+                this.addPauseEventListener();
 				this.setInterval(this.currentGame.speed);
 				this.overlay.remove();
 			}
-            this.endGame = () => {
+            this.pauseGame = () => {
+                if (typeof this.currentGame === 'undefined' || !this.currentGame.started) return;
+                this.currentGame.paused = true;
+                clearInterval(this.interval);
                 this.removeTouchEventListener();
-                this.MS_TETRIS.appendChild(this.overlay);
-                alert("GAME OVER");
+                this.setOverlay("pause");
+            }
+            this.resumeGame = () => {
+                this.currentGame.paused = false;
+                this.setInterval(this.currentGame.speed);
+                this.addTouchEventListener();
+                this.overlay.remove();
+            }
+            this.endGame = () => {
+                this.currentGame.started = false;
+                this.removeTouchEventListener();
+                this.setOverlay("gameover");
             }
             this.pickType = () => {
                 const protoType = this.protoTypes[Math.floor(Math.random() * Object.keys(this.protoTypes).length + 1)];
@@ -348,14 +369,39 @@
                 });
                 this.MS_TETRIS.appendChild(this.nextBlockPreview);
             }
-			this.setOverlay = () => {
-				this.overlay = document.createElement("div");
-				this.overlay.id = "overlay";
-				this.overlay.innerHTML =
-					`
-						<button type="button" id="start">GAME START</button>
+			this.setOverlay = (type) => {
+                if (typeof this.overlay === 'undefined') {
+                    this.overlay = document.createElement("div");
+                    this.overlay.id = "overlay";
+                    this.innerOverlay = document.createElement("div");
+                    this.innerOverlay.classList.add("inner");
+                    this.overlay.appendChild(this.innerOverlay);
+                    this.startButton = document.createElement("button");
+                    this.startButton.id = "start";
+                }
+                this.innerOverlay.innerHTML = "";
+                if (typeof type === 'undefined') {
+                    this.startButton.textContent = "GAME START";
+                } else if (type === 'pause') {
+                    this.startButton.textContent = "RESUME GAME";
+                } else if (type === 'gameover') {
+                    this.innerOverlay.innerHTML =
+                    `
+                        <h3 class="title">GAME OVER</h3>
+                        <div class="gameInfo stage">
+                            <em>STAGE: </em>
+                            <span class="value">${this.currentGame.stage}</span>
+                        </div>
+                        <div class="gameInfo score">
+                            <em>SCORE: </em>
+                            <span class="value">${this.currentGame.score}</span>
+                        </div>
 					`;
-				this.MS_TETRIS.appendChild(this.overlay);
+                    this.startButton.textContent = "START NEW GAME";
+                }
+                this.innerOverlay.appendChild(this.startButton);
+                
+                this.MS_TETRIS.appendChild(this.overlay);
 			}
             this.move = (direction) => {
                 const targetPosition = {...this.currentBlock.position}
@@ -569,6 +615,7 @@
                         if (typeof this.currentBlock !== 'undefined') this.changeType();
                     } else {
                         if (this.touchStatus.movedY > this.touchStatus.unit * 1.5 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
+                            alert("this?")
                             this.move("bottom");
                         }
                     }
@@ -588,6 +635,11 @@
                 this.MS_TETRIS.removeEventListener('pointermove', this.handlePointerMove);
                 this.MS_TETRIS.removeEventListener('pointerup', this.handlePointerUp);
             }
+            this.addPauseEventListener = () => {
+                this.currentGame.pauseButton.addEventListener("click", e => {
+                    this.pauseGame();
+                });
+            }
             this.addEventListener = () => {
                 document.addEventListener("keydown", e => {
                     switch (e.keyCode) {
@@ -598,9 +650,21 @@
 						case 32: this.move("bottom"); break;
                     }
                 });
-				this.MS_TETRIS.querySelector("#start").addEventListener("click", e => {
-					this.startGame();
+				this.startButton.addEventListener("click", e => {
+                    if (typeof this.currentGame === 'undefined') {
+                        this.startGame();
+                    } else if (this.currentGame.paused) {
+                        this.resumeGame();
+                    } else {
+                        this.startGame();
+                    }
 				});
+                document.addEventListener("visibilitychange", () => {
+                    if (document.hidden) this.pauseGame();
+                });
+                document.addEventListener("blur", () => {
+                    this.pauseGame();
+                });
             }
             return this;
         }
