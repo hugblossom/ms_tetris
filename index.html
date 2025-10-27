@@ -568,7 +568,7 @@
                     if (this.touchStatus.absMovedX <= this.touchStatus.unit && this.touchStatus.absMovedY <= this.touchStatus.unit) {
                         if (typeof this.currentBlock !== 'undefined') this.changeType();
                     } else {
-                        if (this.touchStatus.movedY > this.touchStatus.unit * 3 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
+                        if (this.touchStatus.movedY > this.touchStatus.unit * 2 && this.touchStatus.absMovedX < this.touchStatus.movedY) {
                             this.move("bottom");
                         }
                     }
@@ -610,5 +610,6 @@
     </script>
 </body>
 </html>
+
 
 
