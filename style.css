@@ -1,7 +1,21 @@
 @charset "UTF-8";
 
+* {
+    margin: 0;
+    padding: 0;
+}
+
 html {
+    width: 100%;
+    height: 100%;
     font-size: .04vw;
+    overflow: hidden;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 #MS_TETRIS {
@@ -11,6 +25,7 @@ html {
 }
 
 #MS_TETRIS * {
+    touch-action: none;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -86,6 +101,10 @@ html {
 @media (max-width: 500px)  {
     html {
         font-size: .175vw; 
-        overflow: hidden;
+    }
+
+    #next-block-preview {
+        left: auto !important;
+        right: 0;
     }
 }
