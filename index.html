@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2510271741">
+    <link rel="stylesheet" href="./style.css?2510281306">
 </head>
 <body>
     <script>
@@ -242,7 +242,7 @@
                 this.nextBlock = new this.Block(pickedNextType.protoType, pickedNextType.position);
                 this.setNextBlockPreview(this.nextBlock.protoType);
                 this.updateBlockLayer();
-                this.renderBlockLayer();
+                this.renderLayer(this.blockLayerData, this.blockLayer);
             }
 			this.createGame = () => {
 				if (typeof this.currentGame !== 'undefined') this.currentGame.gameInfo.remove();
@@ -327,6 +327,14 @@
                             width: ${this.cellSize}rem;
                             height: ${this.cellSize}rem;
                         `);
+                        const colorLayer = document.createElement("i");
+                        colorLayer.classList.add("colorLayer");
+                        colorLayer.setAttribute("style", 
+                        `
+                            width: ${this.cellSize}rem;
+                            height: ${this.cellSize}rem;
+                        `);
+                        cell.appendChild(colorLayer);
                         this.fieldLayer.appendChild(cell);
                     });
                 });
@@ -363,7 +371,18 @@
                             width: ${this.cellSize}rem;
                             height: ${this.cellSize}rem;
                         `);
-                        if (col) cell.style.background = protoType.color;
+                        const colorLayer = document.createElement("i");
+                        colorLayer.classList.add("colorLayer");
+                        colorLayer.setAttribute("style", 
+                        `
+                            width: ${this.cellSize}rem;
+                            height: ${this.cellSize}rem;
+                        `);
+                        cell.appendChild(colorLayer);
+                        if (col) {
+                            cell.classList.add("valid");
+                            colorLayer.style.background = protoType.color;
+                        }
                         this.nextBlockPreview.appendChild(cell);
                     });
                 });
@@ -435,7 +454,7 @@
                 } else {
                     this.currentBlock.position = targetPosition;
                     this.updateBlockLayer();
-                    this.renderBlockLayer();
+                    this.renderLayer(this.blockLayerData, this.blockLayer);
                 };
             }
             this.setInterval = (speed) => {
@@ -473,8 +492,8 @@
                     }
                 }
                 this.clearLayerData(this.blockLayerData);
-                this.renderFieldLayer();
-                this.renderBlockLayer();
+                this.renderLayer(this.fieldLayerData, this.fieldLayer);
+                this.renderLayer(this.blockLayerData, this.blockLayer);
             }
             this.checkCollision = (type, position) => {
                 let collision = false;
@@ -498,17 +517,13 @@
                 });
                 return collision;
             }
-            this.renderFieldLayer = () => {
-                this.fieldLayerData.forEach((row, y) => {
+            this.renderLayer = (data, target) => {
+                data.forEach((row, y) => {
                     row.forEach((col, x) => {
-                        this.fieldLayer.querySelector(`.cell${y}-${x}`).style.background = col ? col : "transparent";
-                    });
-                });
-            }
-            this.renderBlockLayer = () => {
-                this.blockLayerData.forEach((row, y) => {
-                    row.forEach((col, x) => {
-                        this.blockLayer.querySelector(`.cell${y}-${x}`).style.background = col ? col : "transparent";
+                        const cell = target.querySelector(`.cell${y}-${x}`);
+                        const colorLayer = cell.querySelector(".colorLayer");
+                        col ? cell.classList.add("valid") : cell.classList.remove("valid");
+                        colorLayer.style.background = col ? col : "transparent";
                     });
                 });
             }
@@ -559,7 +574,7 @@
 					this.currentBlock.position = targetPosition;
 					this.currentBlock.currentType = nextType;
 					this.updateBlockLayer();
-					this.renderBlockLayer();
+					this.renderLayer(this.blockLayerData, this.blockLayer);
 				}
             }
             this.init = () => {
@@ -571,9 +586,9 @@
             }
 			this.refresh = () => {
 				clearInterval(this.interval);
-				this.clearLayerData(this.blockLayerData);
+				this.renderLayer(this.blockLayerData, this.blockLayer);
 				this.clearLayerData(this.fieldLayerData);
-				this.renderFieldLayer();
+				this.renderLayer(this.fieldLayerData, this.fieldLayer);
 				this.createBlock();
 			}
             this.initTouchStatus = (e) => {
@@ -680,3 +695,4 @@
     </script>
 </body>
 </html>
+
