@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2510281306">
+    <link rel="stylesheet" href="./style.css?2510271741">
 </head>
 <body>
     <script>
@@ -190,10 +190,10 @@
 					this.score += this.option.scorePerBlock * this.stage;
 					this.updateInfo();
 				}
-				this.clearLine = () => {
-					this.clearedLines ++;
+				this.clearLine = (clearedLines) => {
+					this.clearedLines += clearedLines;
 					if (!(this.clearedLines % 5)) this.upStage();
-					this.score += this.option.scorePerLine * this.stage;
+					this.score += this.option.scorePerLine * this.stage * clearedLines;
 					this.updateInfo();
 				}
 				this.upStage = () => {
@@ -476,6 +476,7 @@
             }
             this.mergeLayer = () => {
                 const currentBlockType = this.currentBlock.protoType.types[this.currentBlock.currentType]; 
+                let clearedLines = 0;
                 for (let y = this.currentBlock.position.y; y < this.currentBlock.position.y + currentBlockType.length; y ++) {
                     for (let x = this.currentBlock.position.x; x < this.currentBlock.position.x + currentBlockType[0].length; x ++) {
                         if (typeof this.blockLayerData[y] === 'undefined'
@@ -487,10 +488,11 @@
                         if (!this.fieldLayerData[y].includes(0)) {
                             this.fieldLayerData.splice(y, 1);
                             this.fieldLayerData.unshift(Array.from({length: this.grid.horizontal}, () => 0));
-							this.currentGame.clearLine();
+                            clearedLines ++;
                         }
                     }
                 }
+                if (clearedLines) this.currentGame.clearLine(clearedLines);
                 this.clearLayerData(this.blockLayerData);
                 this.renderLayer(this.fieldLayerData, this.fieldLayer);
                 this.renderLayer(this.blockLayerData, this.blockLayer);
