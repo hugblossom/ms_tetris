@@ -623,7 +623,7 @@
                     this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
                     this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
 
-                    const weight = this.touchStatus.absMovedX < 10 ? 3 : 1.5;
+                    const weight = this.touchStatus.absMovedX < 10 ? 2.5 : 1.5;
                     if (this.touchStatus.movedY > this.touchStatus.unit / 2 && this.touchStatus.movedY < this.touchStatus.unit * 1.5) {
                         const currentAmount = Math.round(this.touchStatus.absMovedY / (this.touchStatus.unit / (weight * 4)));
                         this.touchStatus.amountY = currentAmount;
