@@ -496,6 +496,9 @@
                 this.clearLayerData(this.blockLayerData);
                 this.renderLayer(this.fieldLayerData, this.fieldLayer);
                 this.renderLayer(this.blockLayerData, this.blockLayer);
+
+                this.removeTouchEventListener();
+                this.addTouchEventListener();
             }
             this.checkCollision = (type, position) => {
                 let collision = false;
@@ -619,23 +622,28 @@
                     this.touchStatus["movedY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
                     this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
-                    
-                    if (this.touchStatus.absMovedX > 5 && this.touchStatus.movedY < this.touchStatus.unit) {
-                        const currentAmount = Math.round(this.touchStatus.absMovedX / (this.touchStatus.unit / 1.5));
-                        if (this.touchStatus.amountX === currentAmount) return;
+
+                    const weight = this.touchStatus.absMovedX < 10 ? 3 : 1.5;
+                    if (this.touchStatus.movedY > this.touchStatus.unit / 2 && this.touchStatus.movedY < this.touchStatus.unit * 1.5) {
+                        const currentAmount = Math.round(this.touchStatus.absMovedY / (this.touchStatus.unit / (weight * 4)));
+                        this.touchStatus.amountY = currentAmount;
+                        this.move("down");
+                        this.initTouchStatus(e);
+                    }
+                    if ( this.touchStatus.absMovedX > 2.5 && this.touchStatus.movedY < this.touchStatus.unit / 1.5) {
+                        const currentAmount = Math.round(this.touchStatus.absMovedX / (this.touchStatus.unit / weight));
+                        if (Math.abs(this.touchStatus.amountX - currentAmount) < .5) return;
                         this.touchStatus.amountX = currentAmount;
                         this.touchStatus.movedX < 0 ? this.move("left") : this.move("right");
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
                     }
-                    
                 }
                 this.handlePointerUp = (e) => {
                     this.touchStatus.dragging = false;
                     e.target.releasePointerCapture(e.pointerId);
                     const moved = typeof this.touchStatus.moved !== 'undefined' && this.touchStatus.moved ? true : false;
-                    
-                        if (this.touchStatus.movedY > this.touchStatus.unit) {
+                        if (this.touchStatus.movedY > this.touchStatus.unit / 3) {
                             this.move("bottom");
                         } else {
                             if (!moved && typeof this.currentBlock !== 'undefined') this.changeType();
@@ -697,4 +705,5 @@
     </script>
 </body>
 </html>
+
 
