@@ -599,8 +599,6 @@
             this.initTouchStatus = (e) => {
                 this.touchStatus["initialX"] = e.clientX;
                 this.touchStatus["initialY"] = e.clientY;
-                this.touchStatus["amountX"] = 0;
-                this.touchStatus["amountY"] = 0;
             }
             this.addTouchEventListener = () => {
                 this.touchStatus = {};
@@ -611,6 +609,8 @@
                     this.touchStatus.dragging = true;
                     this.initTouchStatus(e);
                     e.target.setPointerCapture(e.pointerId);
+                    this.touchStatus["consecutiveX"] = 0;
+                    this.touchStatus["consecutiveY"] = 0;
 
                     this.MS_TETRIS.addEventListener('pointermove', this.handlePointerMove);
                     this.MS_TETRIS.addEventListener('pointerup', this.handlePointerUp);
@@ -618,23 +618,36 @@
                 this.handlePointerMove = (e) => {
                     if (!this.touchStatus.dragging) return;
                     //if (Date.now() - this.touchStatus.beginDate < 100) return;
-                    this.touchStatus["movedX"] = e.clientX - this.touchStatus.initialX;
-                    this.touchStatus["movedY"] = e.clientY - this.touchStatus.initialY;
-                    this.touchStatus["absMovedX"] = Math.abs(this.touchStatus.movedX);
-                    this.touchStatus["absMovedY"] = Math.abs(this.touchStatus.movedY);
+                    this.touchStatus["movedAmountX"] = e.clientX - this.touchStatus.initialX;
+                    this.touchStatus["movedAmountY"] = e.clientY - this.touchStatus.initialY;
+                    this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
+                    this.touchStatus["absMovedAmountY"] = Math.abs(this.touchStatus.movedAmountY);
 
-                    const weight = this.touchStatus.absMovedX < 10 ? 2.5 : 1.5;
-                    if (this.touchStatus.movedY > this.touchStatus.unit / 2 && this.touchStatus.movedY < this.touchStatus.unit * 1.5) {
-                        const currentAmount = Math.round(this.touchStatus.absMovedY / (this.touchStatus.unit / (weight * 4)));
-                        this.touchStatus.amountY = currentAmount;
+                    if (this.touchStatus.absMovedAmountX < 6 && this.touchStatus.absMovedAmountY < 12) return;
+
+                    if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY * 1.2) {
+                        this.touchStatus["direction"] = "h";
+                        if (this.touchStatus.direction === "h") {
+                            this.touchStatus.consecutiveX ++;
+                            this.touchStatus.consecutiveY = 0;
+                        }
+                    } else if (this.touchStatus.absMovedAmountY > this.touchStatus.absMovedAmountX) {
+                        this.touchStatus["direction"] = "v";
+                        if (this.touchStatus.direction === "v") {
+                            this.touchStatus.consecutiveX = 0;
+                            this.touchStatus.consecutiveY ++;
+                        }
+                    }
+                    if (this.touchStatus.direction === "v") {
+                        const currentAmount = this.touchStatus.absMovedAmountY / this.touchStatus.unit;
                         this.move("down");
                         this.initTouchStatus(e);
                     }
-                    if ( this.touchStatus.absMovedX > 2.5 && this.touchStatus.movedY < this.touchStatus.unit / 1.5) {
-                        const currentAmount = Math.round(this.touchStatus.absMovedX / (this.touchStatus.unit / weight));
-                        if (Math.abs(this.touchStatus.amountX - currentAmount) < .5) return;
-                        this.touchStatus.amountX = currentAmount;
-                        this.touchStatus.movedX < 0 ? this.move("left") : this.move("right");
+                    if (this.touchStatus.direction === "h") {
+                        const weight = this.touchStatus.absMovedAmountX < 10 ? 2 : 1.5;
+                        if (this.touchStatus.consecutiveY > 1) return;
+                        this.touchStatus.movedAmountX < 0 ? this.move("left") : this.move("right");
+
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
                     }
@@ -643,17 +656,20 @@
                     this.touchStatus.dragging = false;
                     e.target.releasePointerCapture(e.pointerId);
                     const moved = typeof this.touchStatus.moved !== 'undefined' && this.touchStatus.moved ? true : false;
-                        if (this.touchStatus.movedY > this.touchStatus.unit / 3) {
+                        if (this.touchStatus.consecutiveY > 3 && this.touchStatus.movedAmountY > this.touchStatus.unit / 2) {
                             this.move("bottom");
                         } else {
                             if (!moved && typeof this.currentBlock !== 'undefined') this.changeType();
                         }
                     
                     this.touchStatus["moved"] = false;
-                    this.touchStatus.movedX = 0;
-                    this.touchStatus.movedY = 0;
-                    this.touchStatus.absMovedX = 0;
-                    this.touchStatus.absMovedY = 0;
+                    this.initTouchStatus(e);
+                    this.touchStatus.movedAmountX = 0;
+                    this.touchStatus.movedAmountY = 0;
+                    this.touchStatus.absMovedAmountX = 0;
+                    this.touchStatus.absMovedAmountY = 0;
+                    this.touchStatus["consecutiveX"] = 0;
+                    this.touchStatus["consecutiveY"] = 0;
 
                     this.MS_TETRIS.removeEventListener('pointermove', this.handlePointerMove);
                     this.MS_TETRIS.removeEventListener('pointerup', this.handlePointerUp);
@@ -705,5 +721,6 @@
     </script>
 </body>
 </html>
+
 
 
