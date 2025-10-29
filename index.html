@@ -623,9 +623,9 @@
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
                     this.touchStatus["absMovedAmountY"] = Math.abs(this.touchStatus.movedAmountY);
 
-                    if (this.touchStatus.absMovedAmountX < 6 && this.touchStatus.absMovedAmountY < 12) return;
+                    if (this.touchStatus.absMovedAmountX < 5 && this.touchStatus.absMovedAmountY < 5) return;
 
-                    if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY * 1.2) {
+                    if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY) {
                         this.touchStatus["direction"] = "h";
                         if (this.touchStatus.direction === "h") {
                             this.touchStatus.consecutiveX ++;
