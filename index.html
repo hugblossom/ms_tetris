@@ -588,7 +588,6 @@
                 this.setBlockLayer();
 				this.setOverlay();
                 this.addEventListener();
-				alert(Date.now());
             }
 			this.refresh = () => {
 				clearInterval(this.interval);
@@ -655,14 +654,14 @@
                     if (this.touchStatus.direction === "v") {
                         if (Date.now() - this.touchStatus.moveTime < 20) return;
                         if (this.touchStatus.absMovedAmountY < 5) return;
-                        if (this.touchStatus.consecutiveX > 3) return;
+                        if (this.touchStatus.consecutiveY > 3 && this.touchStatus.accelerationY > 7) return;
                         const currentAmount = this.touchStatus.absMovedAmountY / this.touchStatus.unit;
                         this.move("down");
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
                     }
                     if (this.touchStatus.direction === "h") {
-                        if (Date.now() - this.touchStatus.moveTime < 10) return;
+                        if (Date.now() - this.touchStatus.moveTime < 15) return;
                         if (this.touchStatus.absMovedAmountX < 5) return;
                         const weight = this.touchStatus.absMovedAmountX < 10 ? 2 : 1.5;
                         if (this.touchStatus.consecutiveY > 1) return;
@@ -678,7 +677,7 @@
                     this.touchStatus.dragging = false;
                     e.target.releasePointerCapture(e.pointerId);
                     const moved = typeof this.touchStatus.moved !== 'undefined' && this.touchStatus.moved ? true : false;
-                        if (this.touchStatus.accelerationY > 10 && this.touchStatus.direction === "v" && this.touchStatus.movedAmountY > this.touchStatus.unit) {
+                        if (this.touchStatus.accelerationY > 7 && this.touchStatus.direction === "v" && this.touchStatus.movedAmountY > this.touchStatus.unit) {
                             this.move("bottom");
                         } else {
                             if (!moved && typeof this.currentBlock !== 'undefined' && this.touchStatus.movedAmountX < 15 && this.touchStatus.movedAmountY < 15) this.changeType();
@@ -743,7 +742,6 @@
     </script>
 </body>
 </html>
-
 
 
 
