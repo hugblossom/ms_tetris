@@ -631,7 +631,7 @@
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
                     this.touchStatus["absMovedAmountY"] = Math.abs(this.touchStatus.movedAmountY);
                     
-                    if (this.touchStatus.absMovedAmountX > this.touchStatus.movedAmountY) {
+                    if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY) {
                         if (this.touchStatus.absMovedAmountX < 5) return;
                         this.touchStatus["direction"] = "h";
                         if (this.touchStatus.direction === "h") {
@@ -651,7 +651,7 @@
                         }
                     }
                     if (this.touchStatus.direction === "v") {
-                        if (movedDuration < 30 || this.touchStatus.movedAmountY < 10) return;
+                        if (movedDuration < 30) return;
                         if (this.touchStatus.consecutiveY > 2 && this.touchStatus.accelerationY > 2 && this.touchStatus.movedAmountY > this.touchStatus.unit) {
                             this.touchStatus["allowBottom"] = true;
                             return;
