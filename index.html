@@ -623,7 +623,7 @@
                 }
                 this.handlePointerMove = (e) => {                    
                     if (!this.touchStatus.dragging) return;
-                    if (Date.now() - this.touchStatus.moveTime < 10) return;
+                    if (Date.now() - this.touchStatus.moveTime < 30) return;
                     this.touchStatus["movedAmountX"] = e.clientX - this.touchStatus.initialX;
                     this.touchStatus["movedAmountY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
@@ -719,6 +719,16 @@
                     }
                 });
 				this.startButton.addEventListener("click", e => {
+                    if (typeof this.currentGame === 'undefined') {
+                        this.startGame();
+                    } else if (this.currentGame.paused) {
+                        this.resumeGame();
+                    } else {
+                        this.startGame();
+                    }
+				});
+                this.startButton.addEventListener("keydown", e => {
+                    if (e.keyCode !== 32 || !document.querySelector("#start")) return;
                     if (typeof this.currentGame === 'undefined') {
                         this.startGame();
                     } else if (this.currentGame.paused) {
