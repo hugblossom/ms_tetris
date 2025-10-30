@@ -648,9 +648,6 @@
                             this.touchStatus.consecutiveY ++;
                             if (this.touchStatus.beforeAbsY < this.touchStatus.movedAmountY) this.touchStatus.accelerationY ++;
                             else this.touchStatus.accelerationY = 0;
-                            if (this.touchStatus.accelerationY > 10) {
-                                return;
-                            }
                         }
                     }
                     if (this.touchStatus.direction === "v") {
@@ -780,6 +777,7 @@
     </script>
 </body>
 </html>
+
 
 
 
