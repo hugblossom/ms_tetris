@@ -683,7 +683,7 @@
                             this.move("down");
                             this.move("bottom");
                         } else {
-                            if (!moved && typeof this.currentBlock !== 'undefined' && this.touchStatus.movedAmountX < 15 && this.touchStatus.movedAmountY < 15) this.changeType();
+                            if (!moved && !this.touchStatus.allowBottom && (this.touchStatus.movedAmountX < this.touchStatus.unit && this.touchStatus.movedAmountY < this.touchStatus.unit)) this.changeType();
                         }
                     
                     this.touchStatus["moved"] = false;
@@ -692,8 +692,8 @@
                     this.touchStatus.movedAmountY = 0;
                     this.touchStatus.absMovedAmountX = 0;
                     this.touchStatus.absMovedAmountY = 0;
-                    this.touchStatus["consecutiveX"] = 0;
-                    this.touchStatus["consecutiveY"] = 0;
+                    this.touchStatus.consecutiveX = 0;
+                    this.touchStatus.consecutiveY = 0;
 
                     this.MS_TETRIS.removeEventListener('pointermove', this.handlePointerMove);
                     this.MS_TETRIS.removeEventListener('pointerup', this.handlePointerUp);
