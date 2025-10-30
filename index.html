@@ -651,7 +651,7 @@
                         }
                     }
                     if (this.touchStatus.direction === "v") {
-                        if (movedDuration < 30) return;
+                        if (movedDuration < 30 || this.touchStatus.movedAmountY < 10) return;
                         if (this.touchStatus.consecutiveY > 2 && this.touchStatus.accelerationY > 2 && this.touchStatus.movedAmountY > this.touchStatus.unit) {
                             this.touchStatus["allowBottom"] = true;
                             return;
