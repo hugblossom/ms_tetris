@@ -610,6 +610,7 @@
                     this.touchStatus.dragging = true;
                     this.initTouchStatus(e);
                     e.target.setPointerCapture(e.pointerId);
+                    this.touchStatus["initialTime"] = Date.now();
                     this.touchStatus["moveTime"] = this.touchStatus.initialTime;
                     this.touchStatus["consecutiveX"] = 0;
                     this.touchStatus["consecutiveY"] = 0;
@@ -630,7 +631,8 @@
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
                     this.touchStatus["absMovedAmountY"] = Math.abs(this.touchStatus.movedAmountY);
                     
-                    if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY) {
+                    if (this.touchStatus.absMovedAmountX > this.touchStatus.movedAmountY) {
+                        if (this.touchStatus.absMovedAmountX < 5) return;
                         this.touchStatus["direction"] = "h";
                         if (this.touchStatus.direction === "h") {
                             this.touchStatus.consecutiveX ++;
@@ -638,7 +640,8 @@
                             if (this.touchStatus.beforeAbsX < this.touchStatus.movedAmountX) this.touchStatus.accelerationX ++;
                             else this.touchStatus.accelerationX = 0;
                         }
-                    } else if (this.touchStatus.absMovedAmountY > this.touchStatus.absMovedAmountX) {
+                    } else if (this.touchStatus.movedAmountY > this.touchStatus.absMovedAmountX) {
+                        if (this.touchStatus.movedAmountY < 10) return;
                         this.touchStatus["direction"] = "v";
                         if (this.touchStatus.direction === "v") {
                             this.touchStatus.consecutiveX = 0;
@@ -650,9 +653,8 @@
                             }
                         }
                     }
-                    if (this.touchStatus.absMovedAmountX < 10 && this.touchStatus.absMovedAmountY < 10) return;
                     if (this.touchStatus.direction === "v") {
-                        if (movedDuration < 20) return;
+                        if (movedDuration < 30) return;
                         if (this.touchStatus.consecutiveY > 2 && this.touchStatus.accelerationY > 2 && this.touchStatus.movedAmountY > this.touchStatus.unit) {
                             this.touchStatus["allowBottom"] = true;
                             return;
@@ -662,7 +664,8 @@
                         this.initTouchStatus(e);
                     }
                     if (this.touchStatus.direction === "h") {
-                        if (movedDuration < 30) return;
+                        if (movedDuration < 30 || this.touchStatus.absMovedAmountX < 10) return;
+                        if (this.touchStatus.consecutiveY > 3 && this.touchStatus.accelerationY > 8) return;
                         this.touchStatus.movedAmountX < 0 ? this.move("left") : this.move("right");
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
@@ -688,6 +691,8 @@
                     this.touchStatus.movedAmountY = 0;
                     this.touchStatus.absMovedAmountX = 0;
                     this.touchStatus.absMovedAmountY = 0;
+                    this.touchStatus.consecutiveX = 0;
+                    this.touchStatus.consecutiveY = 0;
 
                     this.MS_TETRIS.removeEventListener('pointermove', this.handlePointerMove);
                     this.MS_TETRIS.removeEventListener('pointerup', this.handlePointerUp);
@@ -775,8 +780,6 @@
     </script>
 </body>
 </html>
-
-
 
 
 
