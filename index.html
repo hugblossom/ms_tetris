@@ -641,7 +641,7 @@
                             else this.touchStatus.accelerationX = 0;
                         }
                     } else if (this.touchStatus.absMovedAmountY > this.touchStatus.absMovedAmountX) {
-                        if (this.touchStatus.movedAmountY < 10) return;
+                        if (this.touchStatus.absMovedAmountY < 10) return;
                         this.touchStatus["direction"] = "v";
                         if (this.touchStatus.direction === "v") {
                             this.touchStatus.consecutiveX = 0;
