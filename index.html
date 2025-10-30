@@ -597,6 +597,7 @@
 				this.createBlock();
 			}
             this.initTouchStatus = (e) => {
+                this.touchStatus["moveTime"] = Date.now();
                 this.touchStatus["initialX"] = e.clientX;
                 this.touchStatus["initialY"] = e.clientY;
             }
@@ -623,13 +624,15 @@
                 }
                 this.handlePointerMove = (e) => {                    
                     if (!this.touchStatus.dragging) return;
-                    if (Date.now() - this.touchStatus.moveTime < 10) return;
+                    const movedDuration = Date.now() - this.touchStatus.moveTime;
+                    if (movedDuration < 5) return;
+                    else 
                     this.touchStatus["movedAmountX"] = e.clientX - this.touchStatus.initialX;
                     this.touchStatus["movedAmountY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
                     this.touchStatus["absMovedAmountY"] = Math.abs(this.touchStatus.movedAmountY);
                     
-                    const movedDuration = Date.now() - this.touchStatus.moveTime;
+                    
                     if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY) {
                         this.touchStatus["direction"] = "h";
                         if (this.touchStatus.direction === "h") {
@@ -665,7 +668,7 @@
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
                     }
-                    this.touchStatus["moveTime"] = Date.now();
+                    
                     this.touchStatus.beforeAbsX = this.touchStatus.absMovedAmountX;
                     this.touchStatus.beforeAbsY = this.touchStatus.absMovedAmountY;
                 }
