@@ -252,6 +252,7 @@
 				this.refresh();
 				this.createGame();
                 this.addTouchEventListener();
+                this.addKeyEventListener();
                 this.addPauseEventListener();
 				this.setInterval(this.currentGame.speed);
 				this.overlay.remove();
@@ -261,17 +262,20 @@
                 this.currentGame.paused = true;
                 clearInterval(this.interval);
                 this.removeTouchEventListener();
+                this.removeKeyEventListener();
                 this.setOverlay("pause");
             }
             this.resumeGame = () => {
                 this.currentGame.paused = false;
                 this.setInterval(this.currentGame.speed);
                 this.addTouchEventListener();
+                this.addKeyEventListener();
                 this.overlay.remove();
             }
             this.endGame = () => {
                 this.currentGame.started = false;
                 this.removeTouchEventListener();
+                this.removeKeyEventListener();
                 this.setOverlay("gameover");
             }
             this.pickType = () => {
@@ -397,12 +401,16 @@
                     this.overlay.appendChild(this.innerOverlay);
                     this.startButton = document.createElement("button");
                     this.startButton.id = "start";
+                    this.restartButton = document.createElement("button");
+                    this.restartButton.id = "restart";
                 }
                 this.innerOverlay.innerHTML = "";
                 if (typeof type === 'undefined') {
                     this.startButton.textContent = "GAME START";
                 } else if (type === 'pause') {
                     this.startButton.textContent = "RESUME GAME";
+                    this.restartButton.textContent = "NEW GAME";
+                    this.innerOverlay.append(this.restartButton);
                 } else if (type === 'gameover') {
                     this.innerOverlay.innerHTML =
                     `
@@ -582,13 +590,6 @@
 					this.renderLayer(this.blockLayerData, this.blockLayer);
 				}
             }
-            this.init = () => {
-				this.setRootLayer();
-                this.setFieldLayer();
-                this.setBlockLayer();
-				this.setOverlay();
-                this.addEventListener();
-            }
 			this.refresh = () => {
 				clearInterval(this.interval);
 				this.renderLayer(this.blockLayerData, this.blockLayer);
@@ -597,7 +598,6 @@
 				this.createBlock();
 			}
             this.initTouchStatus = (e) => {
-                this.touchStatus["moveTime"] = Date.now();
                 this.touchStatus["initialX"] = e.clientX;
                 this.touchStatus["initialY"] = e.clientY;
             }
@@ -625,15 +625,14 @@
                 this.handlePointerMove = (e) => {                    
                     if (!this.touchStatus.dragging) return;
                     const movedDuration = Date.now() - this.touchStatus.moveTime;
-                    if (movedDuration < 5) return;
-                    else 
+                    if (movedDuration < 15) return;
                     this.touchStatus["movedAmountX"] = e.clientX - this.touchStatus.initialX;
                     this.touchStatus["movedAmountY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
                     this.touchStatus["absMovedAmountY"] = Math.abs(this.touchStatus.movedAmountY);
                     
-                    
                     if (this.touchStatus.absMovedAmountX > this.touchStatus.absMovedAmountY) {
+                        if (this.touchStatus.absMovedAmountX < 5) return;
                         this.touchStatus["direction"] = "h";
                         if (this.touchStatus.direction === "h") {
                             this.touchStatus.consecutiveX ++;
@@ -657,18 +656,22 @@
                     if (this.touchStatus.direction === "v") {
                         const currentAmount = this.touchStatus.absMovedAmountY / this.touchStatus.unit;
                         if (movedDuration < 30) return;
+                        if (this.touchStatus.consecutiveY > 2 && this.touchStatus.accelerationY > 4 && this.touchStatus.movedAmountY > this.touchStatus.unit * 1.5) {
+                            this.touchStatus["allowBottom"] = true;
+                            return;
+                        }
                         this.move("down");
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
                     }
                     if (this.touchStatus.direction === "h") {
-                        if (movedDuration < 30 || this.touchStatus.absMovedAmountX < 5) return;
+                        if (movedDuration < 30 || this.touchStatus.absMovedAmountX < 10) return;
                         if (this.touchStatus.consecutiveY > 3 && this.touchStatus.accelerationY > 8) return;
                         this.touchStatus.movedAmountX < 0 ? this.move("left") : this.move("right");
                         this.touchStatus.moved = true;
                         this.initTouchStatus(e);
                     }
-                    
+                    this.touchStatus["moveTime"] = Date.now();
                     this.touchStatus.beforeAbsX = this.touchStatus.absMovedAmountX;
                     this.touchStatus.beforeAbsY = this.touchStatus.absMovedAmountY;
                 }
@@ -676,7 +679,8 @@
                     this.touchStatus.dragging = false;
                     e.target.releasePointerCapture(e.pointerId);
                     const moved = typeof this.touchStatus.moved !== 'undefined' && this.touchStatus.moved ? true : false;
-                        if (this.touchStatus.accelerationY > 10 && this.touchStatus.direction === "v" && this.touchStatus.movedAmountY > this.touchStatus.unit) {
+                        if (typeof this.touchStatus.allowBottom !== 'undefined' && this.touchStatus.allowBottom) {
+                            this.move("down");
                             this.move("bottom");
                         } else {
                             if (!moved && typeof this.currentBlock !== 'undefined' && this.touchStatus.movedAmountX < 15 && this.touchStatus.movedAmountY < 15) this.changeType();
@@ -707,16 +711,22 @@
                     this.pauseGame();
                 });
             }
+            this.handleKeyDown = (e) => {
+                switch (e.keyCode) {
+                    case 40: this.move("down"); break;
+                    case 37: this.move("left"); break;
+                    case 39: this.move("right"); break;
+                    case 38: this.changeType(); break;
+				    case 32: this.move("bottom"); break;
+                }
+            }
+            this.addKeyEventListener = () => {
+                document.addEventListener("keydown", this.handleKeyDown);
+            }
+            this.removeKeyEventListener = () => {
+                document.removeEventListener("keydown", this.handleKeyDown);
+            }
             this.addEventListener = () => {
-                document.addEventListener("keydown", e => {
-                    switch (e.keyCode) {
-                        case 40: this.move("down"); break;
-                        case 37: this.move("left"); break;
-                        case 39: this.move("right"); break;
-                        case 38: this.changeType(); break;
-						case 32: this.move("bottom"); break;
-                    }
-                });
 				this.startButton.addEventListener("click", e => {
                     if (typeof this.currentGame === 'undefined') {
                         this.startGame();
@@ -726,15 +736,28 @@
                         this.startGame();
                     }
 				});
-                this.startButton.addEventListener("keydown", e => {
-                    if (e.keyCode !== 32 || !document.querySelector("#start")) return;
-                    if (typeof this.currentGame === 'undefined') {
-                        this.startGame();
-                    } else if (this.currentGame.paused) {
-                        this.resumeGame();
-                    } else {
-                        this.startGame();
+                this.restartButton.addEventListener("click", e => {
+                    this.startGame();
+				});
+                document.addEventListener("keydown", e => {
+                    if (e.keyCode === 32) {
+                        if (typeof this.currentGame === 'undefined') {
+                            this.startGame();
+                        } else if (this.currentGame.paused) {
+                            this.startGame();
+                        } else if (!this.currentGame.started) {
+                            this.startGame();
+                        }
+                    } else if (e.keyCode === 27) {
+                        if (typeof this.currentGame === 'undefined') return;
+                        if (this.currentGame.started && !this.currentGame.paused) {
+                            this.pauseGame();
+                        } else if (this.currentGame.paused) {
+                            this.resumeGame();
+                        }
+                        
                     }
+                    
 				});
                 document.addEventListener("visibilitychange", () => {
                     if (document.hidden) this.pauseGame();
@@ -742,6 +765,13 @@
                 document.addEventListener("blur", () => {
                     this.pauseGame();
                 });
+            }
+            this.init = () => {
+				this.setRootLayer();
+                this.setFieldLayer();
+                this.setBlockLayer();
+				this.setOverlay();
+                this.addEventListener();
             }
             return this;
         }
