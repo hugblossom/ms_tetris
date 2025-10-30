@@ -143,6 +143,20 @@ body::before {
     background: yellow;
 }
 
+#restart {
+    display: block;
+    width: 240rem;
+    height: 60rem;
+    vertical-align: middle;
+    font-size: 30rem;
+    font-weight: bold;
+    color:yellow;
+    padding: 5rem 10rem 0;
+    margin: 0 auto;
+    border: 5rem solid orange;
+    background: blue;
+}
+
 #start:not(:only-child) {
     margin-top: 30rem;
 }
@@ -169,3 +183,4 @@ body::before {
         opacity: .25;
     }
 }
+
