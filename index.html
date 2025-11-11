@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2510271741">
+    <link rel="stylesheet" href="./style.css?2511111050">
 </head>
 <body>
     <script>
@@ -183,6 +183,7 @@
 				this.speed = 1000;
 				this.clearedBlocks = 0;
 				this.clearedLines = 0;
+                this.combo = 0;
                 this.started = false;
                 this.paused = false;
 				this.clearBlock = () => {
@@ -193,7 +194,7 @@
 				this.clearLine = (clearedLines) => {
 					this.clearedLines += clearedLines;
 					if (!(this.clearedLines % 5)) this.upStage();
-					this.score += this.option.scorePerLine * this.stage * clearedLines;
+					this.score += this.option.scorePerLine * this.combo * this.stage * clearedLines;
 					this.updateInfo();
 				}
 				this.upStage = () => {
@@ -430,6 +431,22 @@
                 
                 this.MS_TETRIS.appendChild(this.overlay);
 			}
+            this.handleComboBox = () => {
+                const comboBox = document.createElement("div");
+                comboBox.classList.add("comboBox");
+                comboBox.innerHTML =
+                `
+                    <span class="combo_${this.currentGame.combo}">
+                        <em>${this.currentGame.combo}<i>combo</i></em>
+                        <em>${this.currentGame.combo}<i>combo</i></em>
+                    </span>
+                `;
+                this.MS_TETRIS.appendChild(comboBox);
+                setTimeout(() => {
+                    comboBox.remove();
+                }, 1000)
+                
+            }
             this.move = (direction) => {
                 const targetPosition = {...this.currentBlock.position}
                 const moveAmount = typeof amount === 'undefined' ? 1 : amount;
@@ -500,7 +517,13 @@
                         }
                     }
                 }
-                if (clearedLines) this.currentGame.clearLine(clearedLines);
+                if (clearedLines) {
+                    this.currentGame.clearLine(clearedLines);
+                    this.currentBlock.combo ++;
+                    this.handleComboBox();
+                } else {
+                    this.currentBlock.combo = 0;
+                }
                 this.clearLayerData(this.blockLayerData);
                 this.renderLayer(this.fieldLayerData, this.fieldLayer);
                 this.renderLayer(this.blockLayerData, this.blockLayer);
@@ -625,7 +648,7 @@
                 this.handlePointerMove = (e) => {                    
                     if (!this.touchStatus.dragging) return;
                     const movedDuration = Date.now() - this.touchStatus.moveTime;
-                    if (movedDuration < 15) return;
+                    if (movedDuration < 10) return;
                     this.touchStatus["movedAmountX"] = e.clientX - this.touchStatus.initialX;
                     this.touchStatus["movedAmountY"] = e.clientY - this.touchStatus.initialY;
                     this.touchStatus["absMovedAmountX"] = Math.abs(this.touchStatus.movedAmountX);
@@ -776,7 +799,6 @@
     </script>
 </body>
 </html>
-
 
 
 
