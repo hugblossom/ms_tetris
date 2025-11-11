@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2511111058">
+    <link rel="stylesheet" href="./style.css?2511111134">
 </head>
 <body>
     <script>
@@ -434,6 +434,7 @@
             this.handleComboBox = () => {
                 const comboBox = document.createElement("div");
                 comboBox.classList.add("comboBox");
+                comboBox.setAttribute("style", `animation: combo ease-out ${this.currentGame.speed / 1000}s`);
                 comboBox.innerHTML =
                 `
                     <span class="combo_${this.currentGame.combo}">
@@ -520,10 +521,10 @@
                 if (clearedLines) {
                     this.currentGame.clearLine(clearedLines);
                     this.currentGame.combo ++;
-                    console.log(this.currentGame.combo)
                     this.handleComboBox();
                 } else {
                     this.currentGame.combo = 0;
+                    
                 }
                 this.clearLayerData(this.blockLayerData);
                 this.renderLayer(this.fieldLayerData, this.fieldLayer);
