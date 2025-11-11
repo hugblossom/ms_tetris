@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS TETRIS</title>
-    <link rel="stylesheet" href="./style.css?2511111134">
+    <link rel="stylesheet" href="./style.css?2510271741">
 </head>
 <body>
     <script>
@@ -194,7 +194,7 @@
 				this.clearLine = (clearedLines) => {
 					this.clearedLines += clearedLines;
 					if (!(this.clearedLines % 5)) this.upStage();
-					this.score += this.option.scorePerLine * this.combo * this.stage * clearedLines;
+					this.score += this.option.scorePerLine * this.stage * clearedLines * (this.combo ? this.combo : 1);
 					this.updateInfo();
 				}
 				this.upStage = () => {
