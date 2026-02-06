@@ -241,10 +241,10 @@
                 this.currentBlock = typeof this.nextBlock === 'undefined' ? new this.Block(pickedCurrentType.protoType, pickedCurrentType.position) : this.nextBlock;
                 let pickedNextType = this.pickType();
 				if (typeof this.continuousType === 'undefined') this.continuousType = new Array();
-				if (pickedCurrentType === pickedNextType) {
+				if (pickedCurrentType.protoType === pickedNextType.protoType) {
 					this.continuousType.push(pickedNextType);
 					if (this.continuousType.length > 3) {
-						while(pickedNextType === this.pickType()) {
+						while(pickedNextType.protoType === this.pickType().protoType) {
 							pickedNextType = this.pickType();
 						}
 						this.continuousType = new Array();
@@ -812,6 +812,7 @@
     </script>
 </body>
 </html>
+
 
 
 
