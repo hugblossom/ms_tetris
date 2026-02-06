@@ -244,7 +244,7 @@
 				if (pickedCurrentType.protoType === pickedNextType.protoType) {
 					this.continuousType.push(pickedNextType);
 					if (this.continuousType.length > 3) {
-						while(pickedNextType.protoType === this.pickType().protoType) {
+						while(pickedCurrentType.protoType === pickedNextType.protoType) {
 							pickedNextType = this.pickType();
 						}
 						this.continuousType = new Array();
@@ -812,6 +812,7 @@
     </script>
 </body>
 </html>
+
 
 
 
