@@ -242,7 +242,7 @@
                 let pickedNextType = this.pickType();
 				if (typeof this.continuousType === 'undefined') this.continuousType = new Array();
 				if (pickedCurrentType === pickedNextType) {
-					this.continuousType.add(pickedNextType);
+					this.continuousType.push(pickedNextType);
 					if (this.continuousType.length > 3) {
 						while(pickedNextType === this.pickType()) {
 							pickedNextType = this.pickType();
@@ -812,6 +812,7 @@
     </script>
 </body>
 </html>
+
 
 
 
