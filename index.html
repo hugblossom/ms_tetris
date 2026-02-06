@@ -239,7 +239,17 @@
 			this.createBlock = () => {
                 const pickedCurrentType = this.pickType();
                 this.currentBlock = typeof this.nextBlock === 'undefined' ? new this.Block(pickedCurrentType.protoType, pickedCurrentType.position) : this.nextBlock;
-                const pickedNextType = this.pickType();
+                let pickedNextType = this.pickType();
+				if (typeof this.continuousType === 'undefined') this.continuousType = new Array();
+				if (pickedCurrentType === pickedNextType) {
+					this.continuousType.add(pickedNextType);
+					if (this.continuousType.length > 3) {
+						while(pickedNextType === this.pickType()) {
+							pickedNextType = this.pickType();
+						}
+						this.continuousType = new Array();
+					}
+				}
                 this.nextBlock = new this.Block(pickedNextType.protoType, pickedNextType.position);
                 this.setNextBlockPreview(this.nextBlock.protoType);
                 this.updateBlockLayer();
@@ -620,6 +630,7 @@
 				this.renderLayer(this.blockLayerData, this.blockLayer);
 				this.clearLayerData(this.fieldLayerData);
 				this.renderLayer(this.fieldLayerData, this.fieldLayer);
+				this.continuousType = new Array();
 				this.createBlock();
 			}
             this.initTouchStatus = (e) => {
@@ -801,6 +812,7 @@
     </script>
 </body>
 </html>
+
 
 
 
