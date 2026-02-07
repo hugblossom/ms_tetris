@@ -51,7 +51,37 @@ body::before {
 
 #field-layer {
     z-index: 0;
+    position: relative;
     background-color: #333;
+}
+
+#field-layer #effect-layer {
+    content: '';
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: rgba(255, 0, 0, .5);
+}
+
+#field-layer #warning-layer.on {
+    content: '';
+    opacity: .25;
+    animation: twincle 2s linear infinite;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: rgba(255, 0, 0, .5);
+}
+
+@keyframes twincle {
+    0% { background: rgba(255, 0, 0, 0); }
+    50% { background: rgba(255, 0, 0, 1); }
+    100% { background: rgba(255, 0, 0, 0); }
 }
 
 #next-block-preview {
@@ -59,6 +89,7 @@ body::before {
 }
 
 .layer span {
+    z-index: 1;
     position: relative;
     display: block;
     float: left;
