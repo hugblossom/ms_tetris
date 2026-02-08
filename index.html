@@ -528,6 +528,7 @@
                 });
             }
             this.mergeLayer = () => {
+                console.log("do merge layer")
                 const currentBlockType = this.currentBlock.protoType.types[this.currentBlock.currentType]; 
                 let clearedLines = 0;
                 let showWarning = false;
@@ -537,8 +538,7 @@
                             || typeof this.blockLayerData[y][x] === 'undefined'
                             || !this.blockLayerData[y][x]) {
                             continue;
-                        }
-                        if (y / this.grid.vertical < 0.4) showWarning = true;
+                        }                        
                         this.fieldLayerData[y][x] = this.blockLayerData[y][x];
                         if (!this.fieldLayerData[y].includes(0)) {
                             this.fieldLayerData.splice(y, 1);
@@ -557,8 +557,16 @@
                 } else {
                     this.currentGame.combo = 0;
                 }
-                this.handleWarningLayer(showWarning);
-
+                for (let i = 0; i < this.fieldLayerData.length; i ++) {
+                    let hasData = false;
+                    this.fieldLayerData[i].forEach(v => {
+                        if (v != 0) {
+                            hasData = true;
+                            this.handleWarningLayer(i / this.grid.vertical < 0.3);
+                        }
+                    });
+                    if (hasData) break;
+                }
                 this.clearLayerData(this.blockLayerData);
                 this.renderLayer(this.fieldLayerData, this.fieldLayer);
                 this.renderLayer(this.blockLayerData, this.blockLayer);
@@ -838,4 +846,3 @@
     </script>
 </body>
 </html>
-
