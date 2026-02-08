@@ -557,7 +557,7 @@
                 } else {
                     this.currentGame.combo = 0;
                 }
-                if (showWarning) this.handleWarningLayer(true);
+                this.handleWarningLayer(showWarning);
 
                 this.clearLayerData(this.blockLayerData);
                 this.renderLayer(this.fieldLayerData, this.fieldLayer);
@@ -838,3 +838,4 @@
     </script>
 </body>
 </html>
+
