@@ -243,21 +243,15 @@
 				if (typeof this.continuousType === 'undefined') this.continuousType = new Array();
 				if (this.currentBlock.protoType === pickedNextType.protoType) {
 					this.continuousType.push(pickedNextType);
+					if (this.continuousType.length > 2) {
+						while(this.currentBlock.protoType === pickedNextType.protoType) {
+							pickedNextType = this.pickType();
+						}
+						this.continuousType = new Array();
+					}
 				} else {
-                     this.continuousType = new Array();
-                }
-                if (typeof this.nextBlock !== 'undefined') {
-                    while(!this.checkTypePercentage(pickedNextType.key)) {
-                        pickedNextType = this.pickType();
-                        if (this.continuousType.length > 2) {
-                            while(this.currentBlock.protoType === pickedNextType.protoType) {
-                                pickedNextType = this.pickType();
-                            }
-                            this.continuousType = new Array();
-                        }
-                    }
-                }
-                this.updateTypeCounter(pickedNextType.key);
+					this.continuousType = new Array();
+				}
                 this.nextBlock = new this.Block(pickedNextType.protoType, pickedNextType.position);
                 this.setNextBlockPreview(this.nextBlock.protoType);
                 this.updateBlockLayer();
@@ -293,25 +287,12 @@
             }
             this.endGame = () => {
                 this.currentGame.started = false;
-                delete this.nextBlock;
                 this.removeTouchEventListener();
                 this.removeKeyEventListener();
                 this.setOverlay("gameover");
             }
-            this.refresh = () => {
-				clearInterval(this.interval);
-				this.renderLayer(this.blockLayerData, this.blockLayer);
-				this.clearLayerData(this.fieldLayerData);
-				this.renderLayer(this.fieldLayerData, this.fieldLayer);
-                this.initTypeCounter();
-                this.continuousType = new Array();
-                this.handleEffectLayer(0);
-                this.handleWarningLayer(false);
-				this.createBlock();
-			}
             this.pickType = () => {
-                const key = Math.floor(Math.random() * Object.keys(this.protoTypes).length + 1).toString();
-                const protoType = this.protoTypes[key];
+                const protoType = this.protoTypes[Math.floor(Math.random() * Object.keys(this.protoTypes).length + 1)];
                 const blockWidth = protoType.types[0].length;
 				const position = {x: 0, y: 0};
 				position.x = Math.floor(this.grid.horizontal / 2) - (Math.floor(blockWidth / 2));
@@ -319,7 +300,7 @@
                     if (position.y < 0) return;
                     if (row.includes(1)) position.y -= y;
                 });
-                return {key, protoType, position};
+                return {protoType, position};
             }
             this.initLayerData = () => {
                 const layerData = [];
@@ -547,6 +528,7 @@
                 });
             }
             this.mergeLayer = () => {
+                console.log("do merge layer")
                 const currentBlockType = this.currentBlock.protoType.types[this.currentBlock.currentType]; 
                 let clearedLines = 0;
                 let showWarning = false;
@@ -674,21 +656,16 @@
 					this.renderLayer(this.blockLayerData, this.blockLayer);
 				}
             }
-            this.initTypeCounter = () => {
-                this.typeCounter = new Map();
-                this.typeCounter.set("total", 0);
-                Object.keys(this.protoTypes).forEach(protoType => {
-                    this.typeCounter.set(protoType, 0);
-                });
-            }
-            this.updateTypeCounter = (protoType) => {
-                this.typeCounter.set(protoType, this.typeCounter.get(protoType) + 1);
-                this.typeCounter.set("total", this.typeCounter.get("total") + 1);
-            }
-            this.checkTypePercentage = (protoType) => {
-                const average = 1 / Object.keys(this.protoTypes).length;
-                return this.typeCounter.get(protoType) / this.typeCounter.get("total") < average * 1.5;
-            }
+			this.refresh = () => {
+				clearInterval(this.interval);
+				this.renderLayer(this.blockLayerData, this.blockLayer);
+				this.clearLayerData(this.fieldLayerData);
+				this.renderLayer(this.fieldLayerData, this.fieldLayer);
+                this.handleEffectLayer(0);
+                this.handleWarningLayer(false);
+				this.continuousType = new Array();
+				this.createBlock();
+			}
             this.initTouchStatus = (e) => {
                 this.touchStatus["initialX"] = e.clientX;
                 this.touchStatus["initialY"] = e.clientY;
