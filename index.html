@@ -299,7 +299,6 @@
                 this.setOverlay("gameover");
             }
             this.refresh = () => {
-				delete this.nextBlock;
 				clearInterval(this.interval);
 				this.renderLayer(this.blockLayerData, this.blockLayer);
 				this.clearLayerData(this.fieldLayerData);
@@ -870,4 +869,3 @@
     </script>
 </body>
 </html>
-
